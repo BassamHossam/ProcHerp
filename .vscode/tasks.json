@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Build Herpaderping",
+            "command": "cl.exe",
+            "args": [
+                "/Zi",
+                "/EHsc",
+                "/Fe:Herpaderping.exe",
+                "HerpaderpingTechnique\\main.c",
+                "HerpaderpingTechnique\\obfuscation.c",
+                "HerpaderpingTechnique\\resolver.c",
+                "HerpaderpingTechnique\\disk_io.c",
+                "HerpaderpingTechnique\\injector.c",
+                "/link",
+                "Userenv.lib"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build task using MSVC cl.exe. Ensure you are running VSCode from the Developer Command Prompt."
+        }
+    ]
+}
