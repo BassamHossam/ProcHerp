@@ -96,13 +96,13 @@ This demonstration highlights the core disk–memory discrepancy with minimal no
 </p>
 
 <p align="center">
-<img src="media/poc_messagebox.gif" width="80%">
+<img src="poc_messagebox.gif" width="60%">
 <br>
 <i>Figure 1: MessageBox payload executing from a herpaderped process.</i>
 </p>
 
 <p align="center">
-<img src="signature_messagebox.png" width="60%">
+<img src="signature_messagebox.png" width="40%">
 <br>
 <i>Figure 2: Digital signature inspection showing a legitimate Microsoft-signed image.</i>
 </p>
@@ -118,13 +118,13 @@ to understand the core technique.
 </p>
 
 <p align="center">
-<img src="media/poc_mimikatz.gif" width="80%">
+<img src="poc_mimikatz.gif" width="80%">
 <br>
 <i>Figure 3: Advanced payload executing while maintaining a trusted on-disk image.</i>
 </p>
 
 <p align="center">
-<img src="media/signature_mimikatz.png" width="60%">
+<img src="signature_mimikatz.png" width="60%">
 <br>
 <i>Figure 4: Verified digital signature of the on-disk executable.</i>
 </p>
