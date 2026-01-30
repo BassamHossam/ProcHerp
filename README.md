@@ -118,13 +118,13 @@ to understand the core technique.
 </p>
 
 <p align="center">
-<img src="poc_mimikatz.gif" width="80%">
+<img src="poc_mimikatz.gif" width="60%">
 <br>
 <i>Figure 3: Advanced payload executing while maintaining a trusted on-disk image.</i>
 </p>
 
 <p align="center">
-<img src="signature_mimikatz.png" width="60%">
+<img src="signature_mimikatz.png" width="40%">
 <br>
 <i>Figure 4: Verified digital signature of the on-disk executable.</i>
 </p>
