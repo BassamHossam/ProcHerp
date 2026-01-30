@@ -17,72 +17,58 @@ Windows Internals · Native NTAPI · Disk–Memory Discrepancy Abuse
 <h2>📌 Executive Summary</h2>
 
 <p>
-<b>PhantomHerpa</b> is a low-level Windows internals research project that demonstrates the <b>Process Herpaderping</b> technique — a stealthy process creation method that exploits a discrepancy between a file’s on-disk representation and its executable image mapped in memory.
+<b>ProcHerp</b> is a low-level Windows internals research project that demonstrates the
+<b>Process Herpaderping</b> technique — a stealthy process creation method abusing
+the discrepancy between a file’s on-disk representation and its executable image
+mapped into memory.
 </p>
 
 <p>
-Unlike traditional injection or hollowing techniques, this approach leverages native Windows behavior using <b>direct NTAPI calls</b> to execute a payload while maintaining a fully legitimate executable image on disk.
+The project relies entirely on <b>native NTAPI calls</b>, avoiding high-level Win32
+abstractions and showcasing how legitimate Windows behavior can be repurposed
+to achieve deceptive execution semantics.
 </p>
 
 <hr>
 
 <h2>🎭 Core Technique: Process Herpaderping</h2>
 
-<p>
-Process Herpaderping abuses the separation between <b>file objects</b> and <b>image sections</b> inside the Windows kernel.
-The execution flow is broken into distinct, surgical stages:
-</p>
-
 <ul>
 <li><b>Stage 1 – The Bait:</b><br>
-A temporary file (<code>.tmp</code>) is created and populated with the controlled payload.</li>
+A temporary file is created and populated with a controlled payload.</li>
 
 <li><b>Stage 2 – The Mapping:</b><br>
-An executable image section is created via <code>NtCreateSection</code> using the <code>SEC_IMAGE</code> flag.  
-At this point, Windows snapshots the payload into memory.</li>
+<code>NtCreateSection</code> is invoked with <code>SEC_IMAGE</code>, causing the kernel to
+snapshot the payload into memory.</li>
 
 <li><b>Stage 3 – The Creation:</b><br>
-A new process object is instantiated using <code>NtCreateProcessEx</code>, backed by the previously created image section.</li>
+A process object is instantiated using <code>NtCreateProcessEx</code> backed by the image section.</li>
 
 <li><b>Stage 4 – The Switch:</b><br>
-Before execution begins, the temporary file on disk is overwritten with a fully legitimate Windows binary (e.g. <code>winload.exe</code>).</li>
+The on-disk file is overwritten with a fully legitimate executable before execution.</li>
 
 <li><b>Stage 5 – The Illusion:</b><br>
-Any inspection of the executable file on disk shows a trusted image, while the memory-resident code executing belongs entirely to the original payload.</li>
+Disk inspection shows a trusted binary, while memory executes the original payload.</li>
 </ul>
 
 <hr>
 
 <h2>🏗️ Software Architecture</h2>
 
-<p>
-The project was intentionally engineered with a <b>clean and modular internal layout</b>, despite being deliverable as a single-file PoC when needed.
-</p>
-
 <ul>
-<li><b>Decoupled Components:</b><br>
-Hashing, file operations, NTAPI resolution, PE parsing, and process logic are isolated from one another.</li>
-
-<li><b>Extensible Design:</b><br>
-The structure allows seamless expansion into additional techniques such as <b>Process Ghosting</b> or <b>Doppelgänging</b>.</li>
-
-<li><b>Symbol & Variable Obfuscation:</b><br>
-Non-standard naming conventions reduce static pattern recognition and signature-based detection.</li>
+<li><b>Decoupled Design:</b> Hashing, NTAPI resolution, file handling, and process logic are isolated.</li>
+<li><b>Extensible Layout:</b> Easily expandable into Ghosting, Doppelgänging, or hybrid loaders.</li>
+<li><b>Obfuscation-Friendly:</b> Non-standard symbols and variable naming reduce static signatures.</li>
 </ul>
 
 <hr>
 
-<h2>👻 Stealth & Anti-Analysis Features</h2>
+<h2>👻 Stealth & Anti-Analysis</h2>
 
 <ul>
-<li><b>Dynamic API Resolution (DJB2):</b><br>
-No suspicious functions are statically imported. All APIs are resolved at runtime via hash-based export walking, keeping the Import Address Table clean.</li>
-
-<li><b>Direct NTAPI Invocation:</b><br>
-All critical operations bypass <code>kernel32.dll</code> and communicate directly with <code>ntdll.dll</code>, reducing exposure to user-mode hooks.</li>
-
-<li><b>PEB & Process Parameter Forging:</b><br>
-The remote process environment, command line, and image path are manually reconstructed to appear fully legitimate under inspection tools.</li>
+<li><b>Dynamic API Resolution (DJB2):</b> Zero suspicious static imports.</li>
+<li><b>Direct NTAPI Calls:</b> Bypasses user-mode hooks in <code>kernel32.dll</code>.</li>
+<li><b>PEB & Parameters Forging:</b> Legitimate-looking image path and command line.</li>
 </ul>
 
 <hr>
@@ -90,20 +76,54 @@ The remote process environment, command line, and image path are manually recons
 <h2>🧠 Memory & Process Management</h2>
 
 <ul>
-<li>Manual allocation and injection of process parameters via <code>NtAllocateVirtualMemory</code> and <code>NtWriteVirtualMemory</code>.</li>
-<li>Environment block reconstruction for native-looking process initialization.</li>
-<li>Execution is started explicitly at the real payload entry point using <code>NtCreateThreadEx</code>.</li>
+<li>Manual process parameter and environment block construction.</li>
+<li>Memory operations via <code>NtAllocateVirtualMemory</code> and <code>NtWriteVirtualMemory</code>.</li>
+<li>Execution initiated using <code>NtCreateThreadEx</code> at the real payload entry point.</li>
 </ul>
+
+<hr>
+
+<h2>▶️ Proof of Concept (PoC)</h2>
+
+<p>
+The following demonstration shows <b>ProcHerp</b> successfully creating and executing
+a herpaderped process while maintaining a fully legitimate on-disk image.
+</p>
+
+<pre>
+ProcHerp.exe &lt;LegitimateBinary.exe&gt; &lt;Payload.exe&gt;
+</pre>
+
+<p align="center">
+<img src="poc_execution.gif" alt="ProcHerp PoC Execution" width="85%">
+<br>
+<i>Figure 1: End-to-end execution flow demonstrating disk–memory discrepancy abuse.</i>
+</p>
+
+<hr>
+
+<h2>🪟 Payload Verification (User Perspective)</h2>
+
+<p>
+From a user and tool inspection standpoint, the payload appears as a
+<b>legitimate Microsoft-verified process</b>, despite executing entirely different
+code in memory.
+</p>
+
+<p align="center">
+<img src="messagebox_verified.png" alt="Microsoft Verified MessageBox" width="60%">
+<br>
+<i>Figure 2: MessageBox displayed from a herpaderped process appearing as a trusted binary.</i>
+</p>
 
 <hr>
 
 <h2>🎯 Research Objectives</h2>
 
 <ul>
-<li>Study kernel behavior around <code>SEC_IMAGE</code> backed sections.</li>
-<li>Observe EDR responses to disk-memory desynchronization.</li>
-<li>Analyze process validation mechanisms relying on on-disk inspection.</li>
-<li>Refine stealthy process creation without traditional hollowing.</li>
+<li>Study kernel behavior around <code>SEC_IMAGE</code> sections.</li>
+<li>Analyze EDR detection gaps caused by disk–memory desynchronization.</li>
+<li>Explore stealthy alternatives to classic process hollowing.</li>
 </ul>
 
 <hr>
@@ -116,11 +136,12 @@ It is designed for malware analysts, reverse engineers, and Windows internals re
 </p>
 
 <p>
-The author does not condone misuse and is not responsible for any illegal or unethical application of this code.
+The author does not condone misuse and is not responsible for any illegal or unethical
+application of this code.
 </p>
 
 <hr>
 
 <p align="center">
-<b>Researcher:</b> BassamHossam (0xUFO)<br>
+<b>Researcher:</b> BassamHossam (0xUFO)
 </p>
