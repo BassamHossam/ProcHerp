@@ -17,7 +17,6 @@ unsigned long CalculateStringHashW(wchar_t* string) {
     wchar_t* currentPointer = string;
 
     while ((character = *currentPointer++)) {
-        // Convert lowercase to uppercase for case-insensitive hashing
         if (character >= 'A' && character <= 'Z') { 
             character += 32; 
         }
