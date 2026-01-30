@@ -102,7 +102,7 @@ This demonstration highlights the core disk–memory discrepancy with minimal no
 </p>
 
 <p align="center">
-<img src="media/signature_messagebox.png" width="60%">
+<img src="signature_messagebox.png" width="60%">
 <br>
 <i>Figure 2: Digital signature inspection showing a legitimate Microsoft-signed image.</i>
 </p>
