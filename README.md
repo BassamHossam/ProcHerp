@@ -156,5 +156,5 @@ application of this code.
 <hr>
 
 <p align="center">
-<b>Researcher:</b> BassamHossam (0xUFO)
+<b>Researcher:</b> BassamHossam (0xufo)
 </p>
